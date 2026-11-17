@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asesmen TKA Kaidah Pencacahan &amp; Peluang</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1b2d;--card:#ffffff;--ink:#14213d;--muted:#5b6475;--pri:#1d4ed8;--pri2:#e0e7ff;--ok:#15803d;--okbg:#dcfce7;--no:#b91c1c;--nobg:#fee2e2;--warn:#b45309;--line:#e2e8f0}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:linear-gradient(135deg,#0f1b2d,#1e3a8a);color:var(--ink);min-height:100vh;padding:16px}
+.wrap{max-width:820px;margin:0 auto}
+.card{background:var(--card);border-radius:18px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+h1{margin:0 0 6px;font-size:1.5rem}
+.sub{color:var(--muted);margin:0 0 18px;font-size:.95rem}
+label{font-weight:600;font-size:.9rem;display:block;margin:12px 0 6px}
+input[type=text],select{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:10px;font:inherit;font-size:1rem}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--pri)}
+.btn{background:var(--pri);color:#fff;border:0;border-radius:10px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;font-size:.95rem}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:var(--pri2);color:var(--pri)}
+.btn.green{background:var(--ok)}
+.err{color:var(--no);font-size:.88rem;min-height:1.2em;margin-top:8px}
+.info{background:#f1f5f9;border-radius:12px;padding:14px;font-size:.9rem;margin-top:16px;line-height:1.6}
+.top{display:flex;justify-content:space-between;align-items:center;color:#fff;margin-bottom:12px;gap:10px;flex-wrap:wrap;font-size:.9rem}
+.bar{height:8px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;margin-bottom:14px}
+.bar>div{height:100%;background:#facc15;transition:width .3s}
+.tag{display:inline-block;background:var(--pri2);color:var(--pri);font-weight:700;font-size:.75rem;padding:4px 10px;border-radius:99px;margin-bottom:10px}
+.qnum{font-weight:800;color:var(--muted);font-size:.85rem;margin-bottom:4px}
+.qtext{font-size:1.05rem;line-height:1.65;margin-bottom:16px}
+.hint{font-size:.85rem;color:var(--warn);margin:-8px 0 12px;font-style:italic}
+.opt{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;line-height:1.5;transition:.15s}
+.opt:hover{border-color:#93c5fd}
+.opt.sel{border-color:var(--pri);background:#eff6ff}
+.opt .k{flex:0 0 30px;height:30px;border-radius:8px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-weight:800}
+.opt.sel .k{background:var(--pri);color:#fff}
+.jrow{display:grid;grid-template-columns:1fr 160px;gap:10px;align-items:center;border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.bsrow{display:flex;gap:10px}
+.bsrow .opt{flex:1;justify-content:center;font-weight:700}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:16px}
+.grid button{border:0;border-radius:8px;padding:8px 0;font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;background:#e2e8f0;color:var(--ink)}
+.grid button.done{background:#bfdbfe;color:var(--pri)}
+.grid button.cur{outline:3px solid #facc15}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:9}
+.modal .card{max-width:420px;text-align:center}
+.score{font-size:3.2rem;font-weight:800;color:var(--pri);margin:6px 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.stats div{background:#f1f5f9;border-radius:12px;padding:10px;font-size:.8rem;color:var(--muted)}
+.stats b{display:block;font-size:1.3rem;color:var(--ink)}
+.pb{border:2px solid var(--line);border-radius:14px;padding:16px;margin-top:14px}
+.pb.benar{border-color:#86efac}
+.pb.salah{border-color:#fca5a5}
+.badge{display:inline-block;font-size:.75rem;font-weight:800;padding:3px 10px;border-radius:99px}
+.badge.b{background:var(--okbg);color:var(--ok)}
+.badge.s{background:var(--nobg);color:var(--no)}
+.ans{font-size:.9rem;margin:8px 0;line-height:1.6}
+.sol{background:#f8fafc;border-left:4px solid var(--pri);padding:10px 14px;border-radius:8px;font-size:.92rem;line-height:1.75;margin-top:8px}
+.filter{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.filter button{border:0;border-radius:99px;padding:6px 12px;font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;background:#e2e8f0}
+.filter button.on{background:var(--pri);color:#fff}
+.foot{text-align:center;color:#cbd5e1;font-size:.78rem;margin-top:16px;line-height:1.6}
+sup,sub{font-size:.72em}
+.frac{display:inline-block;vertical-align:middle;text-align:center;font-size:.9em;margin:0 2px}
+.frac>span{display:block;padding:0 3px}
+.frac>span:first-child{border-bottom:1.5px solid currentColor}
+@media(max-width:560px){.grid{grid-template-columns:repeat(8,1fr)}.jrow{grid-template-columns:1fr}.card{padding:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- LOGIN -->
+<div id="login" class="card">
+  <span class="tag">Asesmen Model TKA Matematika SMA</span>
+  <h1>Kaidah Pencacahan &amp; Peluang</h1>
+  <p class="sub">Aturan perkalian, permutasi, kombinasi, nilai peluang, dan peluang kejadian majemuk</p>
+  <label for="nama">Nama Lengkap</label>
+  <input type="text" id="nama" placeholder="Tulis nama lengkapmu" autocomplete="off">
+  <label for="kelas">Kelas</label>
+  <input type="text" id="kelas" placeholder="Contoh: XII MIPA 1" autocomplete="off">
+  <div class="err" id="loginErr"></div>
+  <button class="btn" style="width:100%;margin-top:6px" onclick="mulai()">Mulai Mengerjakan →</button>
+  <div class="info">
+    <b>Petunjuk:</b><br>
+    • Terdiri atas <b>40 soal</b>: 15 Pilihan Ganda, 10 Pilihan Ganda Kompleks, 5 Menjodohkan, 5 Isian Singkat, dan 5 Benar/Salah.<br>
+    • Satu soal ditampilkan per halaman. Gunakan tombol navigasi atau nomor soal untuk berpindah.<br>
+    • PG Kompleks: pilih <b>semua</b> pernyataan yang benar (bisa lebih dari satu).<br>
+    • Isian singkat pecahan ditulis seperti <b>3/4</b>.<br>
+    • Setiap soal bernilai 1 poin (PG Kompleks dan Menjodohkan dinilai benar jika seluruh jawaban tepat).<br>
+    • Pembahasan lengkap muncul setelah kamu menekan <b>Selesai</b>.
+  </div>
+</div>
+
+<!-- KUIS -->
+<div id="kuis" style="display:none">
+  <div class="top"><span id="who"></span><span id="prog"></span></div>
+  <div class="bar"><div id="barIn" style="width:0"></div></div>
+  <div class="card">
+    <div id="qbox"></div>
+    <div class="nav">
+      <button class="btn ghost" id="prev" onclick="go(cur-1)">← Sebelumnya</button>
+      <button class="btn" id="next" onclick="go(cur+1)">Berikutnya →</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <button class="btn green" style="width:100%;margin-top:14px" onclick="konfirmasi()">✔ Selesai &amp; Lihat Hasil</button>
+  </div>
+</div>
+
+<!-- HASIL -->
+<div id="hasil" style="display:none">
+  <div class="card" style="text-align:center">
+    <span class="tag">Hasil Asesmen</span>
+    <h1 id="hNama"></h1>
+    <p class="sub" id="hKelas"></p>
+    <div class="score" id="hSkor"></div>
+    <div class="stats">
+      <div><b id="hBenar"></b>Benar</div>
+      <div><b id="hSalah"></b>Salah</div>
+      <div><b id="hKosong"></b>Tidak dijawab</div>
+    </div>
+    <div id="hRinci" style="font-size:.85rem;color:var(--muted);line-height:1.7"></div>
+    <button class="btn ghost" style="margin-top:14px" onclick="ulang()">↺ Kerjakan Ulang</button>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h1 style="font-size:1.25rem">Pembahasan Soal</h1>
+    <div class="filter" id="filter"></div>
+    <div id="pbList"></div>
+  </div>
+</div>
+
+<div class="foot">Dikembangkan oleh <b>Noadi Girsang, S.Pd.Gr</b> · SMAN 2 Tangerang<br>noadigirsang21@guru.sma.belajar.id · BADUI (Bahan Ajar Digital Unggul dan Inovatif)</div>
+</div>
+
+<div class="modal" id="modal"><div class="card">
+  <h1 style="font-size:1.2rem">Kumpulkan jawaban?</h1>
+  <p class="sub" id="mTxt"></p>
+  <div style="display:flex;gap:10px;justify-content:center">
+    <button class="btn ghost" onclick="tutupModal()">Periksa lagi</button>
+    <button class="btn green" onclick="selesai()">Ya, kumpulkan</button>
+  </div>
+</div></div>
+
+<script>
+const fr=(a,b)=>`<span class="frac"><span>${a}</span><span>${b}</span></span>`;
+const L="ABCDE";
+
+const SOAL=[
+/* ===== PILIHAN GANDA (15) ===== */
+{t:"pg",q:`Panitia lomba akan membuat nomor peserta berupa bilangan tiga angka yang <b>berbeda</b> dan disusun dari angka 0, 1, 2, 3, 4, 5, dan 6. Nomor peserta yang dipakai hanya bilangan <b>genap</b> yang <b>lebih dari 300</b>. Banyak nomor peserta yang dapat dibuat adalah ....`,
+o:["60","65","70","75","80"],a:2,
+p:`Angka ratusan harus 3, 4, 5, atau 6 (agar lebih dari 300), angka satuan harus genap (0, 2, 4, 6), dan semua angka berbeda. Kasus dipisah berdasarkan angka ratusan:<br>
+<b>Kasus 1: ratusan ganjil (3 atau 5)</b> → 2 pilihan. Satuan bebas dari {0, 2, 4, 6} → 4 pilihan. Puluhan: sisa 7 − 2 = 5 pilihan. Banyak = 2 × 4 × 5 = 40.<br>
+<b>Kasus 2: ratusan genap (4 atau 6)</b> → 2 pilihan. Satuan genap selain angka ratusan → 3 pilihan. Puluhan → 5 pilihan. Banyak = 2 × 3 × 5 = 30.<br>
+Total = 40 + 30 = <b>70</b>. Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Banyak susunan huruf berbeda yang dapat dibentuk dari semua huruf pada kata <b>MATEMATIKA</b> adalah ....`,
+o:["302.400","151.200","75.600","50.400","3.628.800"],a:1,
+p:`Kata MATEMATIKA terdiri atas 10 huruf: M = 2, A = 3, T = 2, E = 1, I = 1, K = 1.<br>
+Permutasi dengan unsur yang sama:<br>
+P = ${fr("10!","2! · 3! · 2!")} = ${fr("3.628.800","2 · 6 · 2")} = ${fr("3.628.800","24")} = <b>151.200</b>. Jawaban <b>B</b>.`},
+
+{t:"pg",q:`Tujuh orang pengurus OSIS, termasuk Ketua dan Wakil Ketua, akan duduk mengelilingi sebuah meja bundar untuk rapat. Jika Ketua dan Wakil Ketua harus selalu duduk berdampingan, banyak cara mereka duduk adalah ....`,
+o:["120","240","480","720","1.440"],a:1,
+p:`Ketua dan Wakil Ketua dianggap satu kelompok, sehingga ada 6 unsur yang duduk melingkar.<br>
+Permutasi siklis 6 unsur = (6 − 1)! = 5! = 120.<br>
+Ketua dan Wakil dapat bertukar posisi di dalam kelompok: 2! = 2.<br>
+Banyak cara = 120 × 2 = <b>240</b>. Jawaban <b>B</b>.`},
+
+{t:"pg",q:`Sebuah tim debat beranggotakan 5 orang akan dipilih dari 8 siswa putra dan 6 siswi putri. Jika tim harus memuat <b>paling sedikit 3 siswi putri</b>, banyak cara memilih tim adalah ....`,
+o:["560","626","686","706","2.002"],a:2,
+p:`"Paling sedikit 3 putri" berarti 3, 4, atau 5 putri.<br>
+• 3 putri, 2 putra: C(6,3) × C(8,2) = 20 × 28 = 560<br>
+• 4 putri, 1 putra: C(6,4) × C(8,1) = 15 × 8 = 120<br>
+• 5 putri, 0 putra: C(6,5) = 6<br>
+Total = 560 + 120 + 6 = <b>686</b>. Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Dua buah dadu bersisi enam dilempar undi bersamaan satu kali. Peluang munculnya jumlah mata dadu yang merupakan <b>bilangan prima</b> adalah ....`,
+o:[fr(1,3),fr(7,18),fr(5,12),fr(4,9),fr(1,2)],a:2,
+p:`n(S) = 6 × 6 = 36. Jumlah mata dadu yang prima: 2, 3, 5, 7, 11.<br>
+• Jumlah 2: (1,1) → 1<br>• Jumlah 3: (1,2),(2,1) → 2<br>• Jumlah 5: (1,4),(2,3),(3,2),(4,1) → 4<br>• Jumlah 7: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1) → 6<br>• Jumlah 11: (5,6),(6,5) → 2<br>
+n(A) = 1 + 2 + 4 + 6 + 2 = 15.<br>
+P(A) = ${fr(15,36)} = <b>${fr(5,12)}</b>. Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Sebuah kotak berisi 5 bola merah, 4 bola biru, dan 3 bola hijau. Diambil 3 bola sekaligus secara acak. Peluang terambil ketiga bola dengan warna yang <b>berbeda-beda</b> adalah ....`,
+o:[fr(1,11),fr(2,11),fr(3,11),fr(4,11),fr(6,11)],a:2,
+p:`n(S) = C(12,3) = ${fr("12 · 11 · 10","3 · 2 · 1")} = 220.<br>
+Warna berbeda berarti 1 merah, 1 biru, 1 hijau: n(A) = C(5,1) × C(4,1) × C(3,1) = 5 × 4 × 3 = 60.<br>
+P(A) = ${fr(60,220)} = <b>${fr(3,11)}</b>. Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Diketahui A dan B adalah dua kejadian dengan P(A) = 0,5; P(B) = 0,4; dan P(A ∪ B) = 0,7. Peluang terjadinya A tetapi <b>tidak</b> B, yaitu P(A ∩ B<sup>c</sup>), adalah ....`,
+o:["0,1","0,2","0,3","0,4","0,5"],a:2,
+p:`P(A ∩ B) = P(A) + P(B) − P(A ∪ B) = 0,5 + 0,4 − 0,7 = 0,2.<br>
+P(A ∩ B<sup>c</sup>) = P(A) − P(A ∩ B) = 0,5 − 0,2 = <b>0,3</b>. Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Peluang Andi lulus seleksi olimpiade adalah 0,8 dan peluang Budi lulus seleksi yang sama adalah 0,7. Kelulusan keduanya tidak saling memengaruhi. Peluang <b>tepat satu</b> di antara mereka yang lulus adalah ....`,
+o:["0,14","0,24","0,38","0,56","0,62"],a:2,
+p:`Kejadian saling bebas. P(Andi tidak lulus) = 0,2; P(Budi tidak lulus) = 0,3.<br>
+Tepat satu lulus = (Andi lulus, Budi tidak) atau (Andi tidak, Budi lulus):<br>
+= 0,8 × 0,3 + 0,2 × 0,7 = 0,24 + 0,14 = <b>0,38</b>. Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Dua dadu dilempar bersamaan. Jika diketahui jumlah kedua mata dadu yang muncul adalah 8, peluang bahwa salah satu dadu menunjukkan mata 3 adalah ....`,
+o:[fr(1,6),fr(1,5),fr(1,3),fr(2,5),fr(1,2)],a:3,
+p:`Ini peluang bersyarat. Ruang sampel yang baru adalah kejadian "jumlah 8":<br>
+B = {(2,6), (3,5), (4,4), (5,3), (6,2)} → n(B) = 5.<br>
+Yang memuat mata 3: (3,5) dan (5,3) → n(A ∩ B) = 2.<br>
+P(A | B) = ${fr("n(A ∩ B)","n(B)")} = <b>${fr(2,5)}</b>. Jawaban <b>D</b>.`},
+
+{t:"pg",q:`Tiga keping uang logam dilempar bersamaan sebanyak 240 kali. Frekuensi harapan muncul <b>paling sedikit dua sisi angka</b> adalah ....`,
+o:["60","90","120","150","180"],a:2,
+p:`n(S) = 2³ = 8. Paling sedikit dua angka: AAG, AGA, GAA, AAA → 4 kejadian.<br>
+P = ${fr(4,8)} = ${fr(1,2)}.<br>
+Frekuensi harapan = P × n = ${fr(1,2)} × 240 = <b>120</b>. Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Sebuah kantong berisi 4 kelereng merah dan 6 kelereng putih. Diambil dua kelereng satu per satu <b>tanpa pengembalian</b>. Peluang kelereng yang terambil pada pengambilan <b>kedua</b> berwarna merah adalah ....`,
+o:[fr(2,15),fr(4,15),fr(1,3),fr(2,5),fr(3,5)],a:3,
+p:`Pengambilan kedua merah bisa terjadi dari dua kemungkinan:<br>
+• Merah lalu merah: ${fr(4,10)} × ${fr(3,9)} = ${fr(12,90)}<br>
+• Putih lalu merah: ${fr(6,10)} × ${fr(4,9)} = ${fr(24,90)}<br>
+Jumlah = ${fr(36,90)} = <b>${fr(2,5)}</b>. Jawaban <b>D</b>.<br>
+<i>Catatan: tanpa melihat hasil pertama, peluang kedua sama dengan peluang awal, yaitu ${fr(4,10)}.</i>`},
+
+{t:"pg",q:`Huruf-huruf pada kata <b>PELUANG</b> akan disusun ulang. Banyak susunan yang dapat dibuat jika semua <b>huruf vokal selalu berdampingan</b> adalah ....`,
+o:["144","360","720","1.440","5.040"],a:2,
+p:`PELUANG terdiri atas 7 huruf berbeda. Vokal: E, U, A (3 huruf); konsonan: P, L, N, G (4 huruf).<br>
+Tiga vokal dianggap satu blok → ada 1 blok + 4 konsonan = 5 unsur → 5! = 120 susunan.<br>
+Vokal di dalam blok dapat disusun 3! = 6 cara.<br>
+Banyak susunan = 120 × 6 = <b>720</b>. Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Dalam sebuah pertemuan, setiap peserta berjabat tangan tepat satu kali dengan setiap peserta lainnya. Jika tercatat ada 66 jabat tangan, banyak peserta pertemuan tersebut adalah ....`,
+o:["10","11","12","13","14"],a:2,
+p:`Satu jabat tangan melibatkan 2 orang tanpa memperhatikan urutan, sehingga banyak jabat tangan = C(n,2).<br>
+${fr("n(n − 1)","2")} = 66 → n(n − 1) = 132 → n² − n − 132 = 0 → (n − 12)(n + 11) = 0.<br>
+n = 12 (n = −11 tidak memenuhi). Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Terdapat 10 titik pada sebuah bidang. Di antara titik-titik tersebut, terdapat 4 titik yang terletak pada satu garis lurus, sedangkan titik lainnya tidak ada tiga yang segaris. Banyak segitiga yang dapat dibentuk dengan titik sudut dari titik-titik tersebut adalah ....`,
+o:["96","112","116","120","124"],a:2,
+p:`Jika tidak ada titik segaris: C(10,3) = 120 segitiga.<br>
+Tiga titik yang segaris tidak membentuk segitiga. Banyak pilihan 3 titik dari 4 titik segaris: C(4,3) = 4.<br>
+Banyak segitiga = 120 − 4 = <b>116</b>. Jawaban <b>C</b>.`},
+
+{t:"pg",q:`Dari seperangkat kartu bridge (52 kartu) diambil 2 kartu sekaligus secara acak. Peluang terambil <b>dua kartu berwarna merah atau dua kartu King</b> adalah ....`,
+o:[fr(25,102),fr(163,663),fr(55,221),fr(28,102),fr(56,221)],a:2,
+p:`n(S) = C(52,2) = 1.326.<br>
+A = dua kartu merah: C(26,2) = 325.<br>
+B = dua kartu King: C(4,2) = 6.<br>
+A ∩ B = dua King merah (King hati dan King wajik): C(2,2) = 1.<br>
+n(A ∪ B) = 325 + 6 − 1 = 330.<br>
+P(A ∪ B) = ${fr(330,1326)} = <b>${fr(55,221)}</b>. Jawaban <b>C</b>.<br>
+<i>Kejadian A dan B tidak saling lepas, sehingga irisannya harus dikurangkan.</i>`},
+
+/* ===== PG KOMPLEKS (10) ===== */
+{t:"pgk",q:`Dari angka 1, 2, 3, 4, dan 5 akan disusun bilangan tiga angka <b>tanpa pengulangan</b>. Pilihlah semua pernyataan yang <b>benar</b>!`,
+o:["Banyak bilangan yang dapat disusun seluruhnya adalah 60.","Banyak bilangan genap yang dapat disusun adalah 24.","Banyak bilangan yang lebih dari 300 adalah 36.","Banyak bilangan ganjil yang dapat disusun adalah 30.","Banyak bilangan kelipatan 5 yang dapat disusun adalah 15."],a:[0,1,2],
+p:`(1) Total = 5 × 4 × 3 = 60 → <b>Benar</b>.<br>
+(2) Genap: satuan 2 atau 4 (2 pilihan) → 2 × 4 × 3 = 24 → <b>Benar</b>.<br>
+(3) Lebih dari 300: ratusan 3, 4, 5 (3 pilihan) → 3 × 4 × 3 = 36 → <b>Benar</b>.<br>
+(4) Ganjil: satuan 1, 3, 5 (3 pilihan) → 3 × 4 × 3 = 36, bukan 30 → <b>Salah</b>.<br>
+(5) Kelipatan 5: satuan harus 5 → 1 × 4 × 3 = 12, bukan 15 → <b>Salah</b>.<br>
+Jawaban: pernyataan <b>A, B, C</b>.`},
+
+{t:"pgk",q:`Pilihlah semua pernyataan yang <b>benar</b> mengenai permutasi dan kombinasi berikut!`,
+o:["P(6, 2) = 30","C(7, 3) = C(7, 4)","C(10, 2) = 90","P(n, r) = r! × C(n, r)","0! = 0"],a:[0,1,3],
+p:`(1) P(6,2) = ${fr("6!","4!")} = 6 × 5 = 30 → <b>Benar</b>.<br>
+(2) C(n,r) = C(n, n − r), sehingga C(7,3) = C(7,4) = 35 → <b>Benar</b>.<br>
+(3) C(10,2) = ${fr("10 × 9","2")} = 45, bukan 90 (90 adalah P(10,2)) → <b>Salah</b>.<br>
+(4) C(n,r) = ${fr("n!","r!(n − r)!")} dan P(n,r) = ${fr("n!","(n − r)!")}, sehingga P(n,r) = r! × C(n,r) → <b>Benar</b>.<br>
+(5) Menurut definisi 0! = 1 → <b>Salah</b>.<br>
+Jawaban: pernyataan <b>A, B, D</b>.`},
+
+{t:"pgk",q:`Huruf-huruf pada kata <b>KELAS</b> akan disusun ulang. Pilihlah semua pernyataan yang <b>benar</b>!`,
+o:["Banyak semua susunan huruf adalah 120.","Banyak susunan yang diawali huruf K adalah 24.","Banyak susunan dengan huruf vokal selalu berdampingan adalah 48.","Banyak susunan dengan huruf vokal tidak berdampingan adalah 60.","Banyak susunan yang diawali dan diakhiri huruf konsonan adalah 36."],a:[0,1,2,4],
+p:`KELAS: 5 huruf berbeda; vokal E, A; konsonan K, L, S.<br>
+(1) 5! = 120 → <b>Benar</b>.<br>
+(2) K di depan, sisa 4 huruf: 4! = 24 → <b>Benar</b>.<br>
+(3) EA satu blok → 4 unsur: 4! × 2! = 24 × 2 = 48 → <b>Benar</b>.<br>
+(4) Vokal tidak berdampingan = 120 − 48 = 72, bukan 60 → <b>Salah</b>.<br>
+(5) Posisi awal dan akhir diisi 2 dari 3 konsonan: P(3,2) = 6; 3 huruf sisanya di tengah: 3! = 6 → 6 × 6 = 36 → <b>Benar</b>.<br>
+Jawaban: pernyataan <b>A, B, C, E</b>.`},
+
+{t:"pgk",q:`Dari 6 siswa putra dan 4 siswi putri akan dipilih 4 orang sebagai perwakilan kelas. Pilihlah semua pernyataan yang <b>benar</b>!`,
+o:["Banyak cara memilih tanpa syarat adalah 210.","Banyak cara memilih jika semuanya putra adalah 15.","Banyak cara memilih tepat 2 putri adalah 90.","Banyak cara memilih paling sedikit 1 putri adalah 185.","Banyak cara memilih jika semuanya putri adalah 4."],a:[0,1,2],
+p:`(1) C(10,4) = ${fr("10 × 9 × 8 × 7","24")} = 210 → <b>Benar</b>.<br>
+(2) C(6,4) = 15 → <b>Benar</b>.<br>
+(3) C(4,2) × C(6,2) = 6 × 15 = 90 → <b>Benar</b>.<br>
+(4) Paling sedikit 1 putri = total − semua putra = 210 − 15 = 195, bukan 185 → <b>Salah</b>.<br>
+(5) C(4,4) = 1, bukan 4 → <b>Salah</b>.<br>
+Jawaban: pernyataan <b>A, B, C</b>.`},
+
+{t:"pgk",q:`Dua dadu dilempar bersamaan satu kali. Pilihlah semua pernyataan yang <b>benar</b>!`,
+o:[`Peluang muncul jumlah mata dadu 7 adalah ${fr(1,6)}.`,`Peluang muncul mata dadu kembar adalah ${fr(1,6)}.`,`Peluang muncul jumlah mata dadu lebih dari 9 adalah ${fr(1,4)}.`,`Peluang hasil kali kedua mata dadu genap adalah ${fr(3,4)}.`,`Peluang muncul jumlah mata dadu 7 atau 11 adalah ${fr(1,4)}.`],a:[0,1,3],
+p:`n(S) = 36.<br>
+(1) Jumlah 7 ada 6 pasangan → ${fr(6,36)} = ${fr(1,6)} → <b>Benar</b>.<br>
+(2) Kembar: (1,1), …, (6,6) = 6 → ${fr(1,6)} → <b>Benar</b>.<br>
+(3) Lebih dari 9: jumlah 10 (3), 11 (2), 12 (1) = 6 → ${fr(6,36)} = ${fr(1,6)}, bukan ${fr(1,4)} → <b>Salah</b>.<br>
+(4) Hasil kali ganjil hanya jika kedua mata ganjil: 3 × 3 = 9. Hasil kali genap = 36 − 9 = 27 → ${fr(27,36)} = ${fr(3,4)} → <b>Benar</b>.<br>
+(5) Jumlah 7 (6) atau 11 (2) = 8 → ${fr(8,36)} = ${fr(2,9)}, bukan ${fr(1,4)} → <b>Salah</b>.<br>
+Jawaban: pernyataan <b>A, B, D</b>.`},
+
+{t:"pgk",q:`Diketahui A dan B adalah dua kejadian yang <b>saling bebas</b> dengan P(A) = 0,6 dan P(B) = 0,5. Pilihlah semua pernyataan yang <b>benar</b>!`,
+o:["P(A ∩ B) = 0,3","P(A ∪ B) = 0,8","P(A | B) = 0,6","A dan B merupakan kejadian saling lepas.","P(A<sup>c</sup> ∩ B<sup>c</sup>) = 0,2"],a:[0,1,2,4],
+p:`(1) Saling bebas: P(A ∩ B) = 0,6 × 0,5 = 0,3 → <b>Benar</b>.<br>
+(2) P(A ∪ B) = 0,6 + 0,5 − 0,3 = 0,8 → <b>Benar</b>.<br>
+(3) P(A | B) = ${fr("P(A ∩ B)","P(B)")} = ${fr("0,3","0,5")} = 0,6 → <b>Benar</b> (pada kejadian saling bebas, P(A | B) = P(A)).<br>
+(4) Saling lepas berarti P(A ∩ B) = 0, padahal P(A ∩ B) = 0,3 → <b>Salah</b>.<br>
+(5) P(A<sup>c</sup> ∩ B<sup>c</sup>) = 1 − P(A ∪ B) = 1 − 0,8 = 0,2 → <b>Benar</b>.<br>
+Jawaban: pernyataan <b>A, B, C, E</b>.`},
+
+{t:"pgk",q:`Sebuah kotak berisi 5 bola merah dan 3 bola putih. Diambil 2 bola sekaligus secara acak. Pilihlah semua pernyataan yang <b>benar</b>!`,
+o:[`Peluang terambil keduanya merah adalah ${fr(5,14)}.`,`Peluang terambil keduanya putih adalah ${fr(3,28)}.`,`Peluang terambil 1 merah dan 1 putih adalah ${fr(15,28)}.`,`Peluang terambil paling sedikit 1 bola putih adalah ${fr(1,2)}.`,`Peluang terambil kedua bola berwarna sama adalah ${fr(13,28)}.`],a:[0,1,2,4],
+p:`n(S) = C(8,2) = 28.<br>
+(1) C(5,2) = 10 → ${fr(10,28)} = ${fr(5,14)} → <b>Benar</b>.<br>
+(2) C(3,2) = 3 → ${fr(3,28)} → <b>Benar</b>.<br>
+(3) C(5,1) × C(3,1) = 15 → ${fr(15,28)} → <b>Benar</b>.<br>
+(4) Paling sedikit 1 putih = 1 − P(keduanya merah) = 1 − ${fr(10,28)} = ${fr(18,28)} = ${fr(9,14)}, bukan ${fr(1,2)} → <b>Salah</b>.<br>
+(5) Warna sama = ${fr(10,28)} + ${fr(3,28)} = ${fr(13,28)} → <b>Benar</b>.<br>
+Jawaban: pernyataan <b>A, B, C, E</b>.`},
+
+{t:"pgk",q:`Sebuah dadu dilempar satu kali. Didefinisikan kejadian A = muncul mata dadu genap, B = muncul mata dadu prima, dan C = muncul mata dadu 1. Pilihlah semua pernyataan yang <b>benar</b>!`,
+o:["A dan C merupakan kejadian saling lepas.","A dan B merupakan kejadian saling lepas.",`P(A ∪ B) = ${fr(5,6)}`,`P(A ∩ B) = ${fr(1,6)}`,"A dan B merupakan kejadian saling bebas."],a:[0,2,3],
+p:`A = {2, 4, 6}, B = {2, 3, 5}, C = {1}.<br>
+(1) A ∩ C = ∅ → saling lepas → <b>Benar</b>.<br>
+(2) A ∩ B = {2} ≠ ∅ → tidak saling lepas → <b>Salah</b>.<br>
+(3) A ∪ B = {2, 3, 4, 5, 6} → ${fr(5,6)} → <b>Benar</b>.<br>
+(4) A ∩ B = {2} → ${fr(1,6)} → <b>Benar</b>.<br>
+(5) P(A) × P(B) = ${fr(1,2)} × ${fr(1,2)} = ${fr(1,4)} ≠ P(A ∩ B) = ${fr(1,6)} → tidak saling bebas → <b>Salah</b>.<br>
+Jawaban: pernyataan <b>A, C, D</b>.`},
+
+{t:"pgk",q:`Enam orang, termasuk Ani dan Budi, akan duduk mengelilingi meja bundar. Pilihlah semua pernyataan yang <b>benar</b>!`,
+o:["Banyak cara duduk tanpa syarat adalah 120.","Banyak cara duduk jika Ani dan Budi selalu berdampingan adalah 48.","Banyak cara duduk jika Ani dan Budi tidak berdampingan adalah 72.","Jika 6 manik-manik berbeda warna dirangkai menjadi sebuah gelang, banyak rangkaian berbeda adalah 60.","Jika keenam orang duduk berjajar dalam satu baris, banyak cara Ani dan Budi berdampingan adalah 120."],a:[0,1,2,3],
+p:`(1) Siklis: (6 − 1)! = 5! = 120 → <b>Benar</b>.<br>
+(2) Ani–Budi satu kelompok → 5 unsur melingkar: 4! × 2! = 24 × 2 = 48 → <b>Benar</b>.<br>
+(3) Tidak berdampingan = 120 − 48 = 72 → <b>Benar</b>.<br>
+(4) Gelang dapat dibalik, sehingga ${fr("(6 − 1)!","2")} = ${fr(120,2)} = 60 → <b>Benar</b>.<br>
+(5) Berjajar, Ani–Budi satu kelompok → 5 unsur: 5! × 2! = 240, bukan 120 → <b>Salah</b>.<br>
+Jawaban: pernyataan <b>A, B, C, D</b>.`},
+
+{t:"pgk",q:`Di sebuah kelas terdapat 40 siswa. Sebanyak 25 siswa menyukai Matematika, 20 siswa menyukai Fisika, dan 10 siswa menyukai keduanya. Dipilih satu siswa secara acak. Pilihlah semua pernyataan yang <b>benar</b>!`,
+o:[`Peluang terpilih siswa yang menyukai Matematika atau Fisika adalah ${fr(7,8)}.`,`Peluang terpilih siswa yang tidak menyukai keduanya adalah ${fr(1,8)}.`,`Peluang terpilih siswa yang menyukai Fisika, jika diketahui ia menyukai Matematika, adalah ${fr(2,5)}.`,`Peluang terpilih siswa yang hanya menyukai Matematika adalah ${fr(1,2)}.`,`Peluang terpilih siswa yang menyukai Matematika, jika diketahui ia menyukai Fisika, adalah ${fr(1,2)}.`],a:[0,1,2,4],
+p:`n(M ∪ F) = 25 + 20 − 10 = 35.<br>
+(1) ${fr(35,40)} = ${fr(7,8)} → <b>Benar</b>.<br>
+(2) Tidak suka keduanya = 40 − 35 = 5 → ${fr(5,40)} = ${fr(1,8)} → <b>Benar</b>.<br>
+(3) P(F | M) = ${fr(10,25)} = ${fr(2,5)} → <b>Benar</b>.<br>
+(4) Hanya Matematika = 25 − 10 = 15 → ${fr(15,40)} = ${fr(3,8)}, bukan ${fr(1,2)} → <b>Salah</b>.<br>
+(5) P(M | F) = ${fr(10,20)} = ${fr(1,2)} → <b>Benar</b>.<br>
+Jawaban: pernyataan <b>A, B, C, E</b>.`},
+
+/* ===== MENJODOHKAN (5) ===== */
+{t:"jodoh",q:`Jodohkan setiap bentuk berikut dengan nilainya yang tepat!`,
+l:["P(5, 2)","C(6, 2)","4!","C(8, 3)"],r:["15","20","24","30","56"],a:[1,0,2,4],
+p:`• P(5,2) = 5 × 4 = <b>20</b><br>
+• C(6,2) = ${fr("6 × 5","2")} = <b>15</b><br>
+• 4! = 4 × 3 × 2 × 1 = <b>24</b><br>
+• C(8,3) = ${fr("8 × 7 × 6","3 × 2 × 1")} = <b>56</b><br>
+Pilihan 30 adalah pengecoh.`},
+
+{t:"jodoh",q:`Jodohkan setiap permasalahan berikut dengan banyak cara yang tepat!`,
+l:["Memilih ketua, sekretaris, dan bendahara dari 8 calon","Memilih 3 orang pengurus (tanpa jabatan) dari 8 calon","Menyusun 5 orang duduk mengelilingi meja bundar","Menyusun semua huruf pada kata SAMA"],r:["12","24","56","120","336"],a:[4,2,1,0],
+p:`• Jabatan berbeda (urutan diperhatikan) → P(8,3) = 8 × 7 × 6 = <b>336</b><br>
+• Tanpa jabatan (urutan tidak diperhatikan) → C(8,3) = <b>56</b><br>
+• Permutasi siklis → (5 − 1)! = 4! = <b>24</b><br>
+• SAMA: 4 huruf dengan A muncul 2 kali → ${fr("4!","2!")} = <b>12</b><br>
+Pilihan 120 adalah pengecoh.`},
+
+{t:"jodoh",q:`Dua dadu dilempar bersamaan satu kali. Jodohkan setiap kejadian dengan peluangnya!`,
+l:["Muncul jumlah mata dadu 5","Muncul jumlah mata dadu 12","Muncul mata dadu kembar","Muncul jumlah mata dadu 4"],r:[fr(1,36),fr(1,12),fr(1,9),fr(5,36),fr(1,6)],a:[2,0,4,1],
+p:`n(S) = 36.<br>
+• Jumlah 5: (1,4),(2,3),(3,2),(4,1) = 4 → ${fr(4,36)} = <b>${fr(1,9)}</b><br>
+• Jumlah 12: (6,6) = 1 → <b>${fr(1,36)}</b><br>
+• Kembar: 6 → ${fr(6,36)} = <b>${fr(1,6)}</b><br>
+• Jumlah 4: (1,3),(2,2),(3,1) = 3 → ${fr(3,36)} = <b>${fr(1,12)}</b><br>
+Pilihan ${fr(5,36)} adalah pengecoh.`},
+
+{t:"jodoh",q:`Diketahui P(A) = 0,4 dan P(B) = 0,5. Jodohkan setiap pernyataan dengan nilainya yang tepat!`,
+l:["P(A ∪ B) jika A dan B saling lepas","P(A ∩ B) jika A dan B saling bebas","P(A ∪ B) jika A dan B saling bebas","P(A<sup>c</sup>)"],r:["0,1","0,2","0,6","0,7","0,9"],a:[4,1,3,2],
+p:`• Saling lepas: P(A ∪ B) = 0,4 + 0,5 = <b>0,9</b><br>
+• Saling bebas: P(A ∩ B) = 0,4 × 0,5 = <b>0,2</b><br>
+• Saling bebas: P(A ∪ B) = 0,4 + 0,5 − 0,2 = <b>0,7</b><br>
+• Komplemen: P(A<sup>c</sup>) = 1 − 0,4 = <b>0,6</b><br>
+Pilihan 0,1 adalah pengecoh.`},
+
+{t:"jodoh",q:`Jodohkan setiap percobaan berikut dengan frekuensi harapannya!`,
+l:["Satu dadu dilempar 120 kali, muncul mata dadu prima","Dua koin dilempar 200 kali, muncul dua sisi gambar","Dua dadu dilempar 180 kali, muncul jumlah mata dadu 7","Tiga koin dilempar 160 kali, muncul paling sedikit satu sisi angka"],r:["30","50","60","80","140"],a:[2,1,0,4],
+p:`Frekuensi harapan F<sub>h</sub> = P(A) × n.<br>
+• Mata prima {2,3,5}: ${fr(3,6)} × 120 = <b>60</b><br>
+• Dua gambar (GG): ${fr(1,4)} × 200 = <b>50</b><br>
+• Jumlah 7: ${fr(6,36)} × 180 = <b>30</b><br>
+• Paling sedikit satu angka = 1 − P(GGG) = 1 − ${fr(1,8)} = ${fr(7,8)} → ${fr(7,8)} × 160 = <b>140</b><br>
+Pilihan 80 adalah pengecoh.`},
+
+/* ===== ISIAN SINGKAT (5) ===== */
+{t:"isian",q:`Jika C(n, 2) = 28, nilai n adalah ....`,a:"8",
+p:`${fr("n(n − 1)","2")} = 28 → n(n − 1) = 56 → n² − n − 56 = 0 → (n − 8)(n + 7) = 0.<br>
+Karena n bilangan asli, n = <b>8</b>.`},
+
+{t:"isian",q:`Empat buku Matematika yang berbeda dan tiga buku Fisika yang berbeda akan disusun berjajar pada sebuah rak. Jika buku-buku yang sejenis harus selalu berdampingan, banyak susunan yang mungkin adalah ....`,a:"288",
+p:`Kelompok Matematika dan kelompok Fisika dapat ditukar urutannya: 2! = 2.<br>
+Susunan di dalam kelompok Matematika: 4! = 24; di dalam kelompok Fisika: 3! = 6.<br>
+Banyak susunan = 2 × 24 × 6 = <b>288</b>.`},
+
+{t:"isian",q:`Dari angka 0, 1, 2, 3, 4, dan 5 akan disusun bilangan empat angka dengan angka-angka yang <b>berbeda</b>. Banyak bilangan yang dapat disusun adalah ....`,a:"300",
+p:`Ribuan tidak boleh 0 → 5 pilihan.<br>
+Ratusan: 0 sudah boleh, tetapi tidak sama dengan ribuan → 5 pilihan.<br>
+Puluhan → 4 pilihan; satuan → 3 pilihan.<br>
+Banyak bilangan = 5 × 5 × 4 × 3 = <b>300</b>.`},
+
+{t:"isian",q:`Sebuah kotak berisi 6 bola merah dan 4 bola biru. Diambil 3 bola sekaligus secara acak. Peluang terambil <b>paling sedikit 2 bola biru</b> adalah .... <br><small>(tulis dalam bentuk pecahan paling sederhana, misalnya 3/4)</small>`,a:"1/3",
+p:`n(S) = C(10,3) = 120.<br>
+• 2 biru, 1 merah: C(4,2) × C(6,1) = 6 × 6 = 36<br>
+• 3 biru: C(4,3) = 4<br>
+n(A) = 36 + 4 = 40.<br>
+P(A) = ${fr(40,120)} = <b>${fr(1,3)}</b>.`},
+
+{t:"isian",q:`Peluang seorang bayi terserang suatu penyakit di sebuah daerah adalah 0,05. Jika di daerah tersebut terdapat 1.200 bayi, frekuensi harapan bayi yang <b>tidak</b> terserang penyakit tersebut adalah .... bayi.`,a:"1140",
+p:`P(tidak terserang) = 1 − 0,05 = 0,95.<br>
+F<sub>h</sub> = 0,95 × 1.200 = <b>1.140</b> bayi.`},
+
+/* ===== BENAR / SALAH (5) ===== */
+{t:"bs",q:`Tentukan apakah pernyataan berikut <b>Benar</b> atau <b>Salah</b>.<br><br>"Untuk setiap bilangan asli n dan r dengan r ≤ n, berlaku C(n, r) = C(n, n − r)."`,a:true,
+p:`C(n, n − r) = ${fr("n!","(n − r)! · (n − (n − r))!")} = ${fr("n!","(n − r)! · r!")} = C(n, r).<br>
+Contoh: C(7,2) = C(7,5) = 21. Pernyataan <b>Benar</b>.`},
+
+{t:"bs",q:`Tentukan apakah pernyataan berikut <b>Benar</b> atau <b>Salah</b>.<br><br>"Banyak cara 5 orang duduk mengelilingi meja bundar adalah 120 cara."`,a:false,
+p:`Permutasi siklis 5 unsur = (5 − 1)! = 4! = 24 cara. Angka 120 = 5! adalah susunan berjajar (bukan melingkar). Pernyataan <b>Salah</b>.`},
+
+{t:"bs",q:`Tentukan apakah pernyataan berikut <b>Benar</b> atau <b>Salah</b>.<br><br>"Jika A dan B adalah dua kejadian saling lepas, maka P(A ∩ B) = 0 dan P(A ∪ B) = P(A) + P(B)."`,a:true,
+p:`Saling lepas berarti A ∩ B = ∅, sehingga P(A ∩ B) = 0 dan P(A ∪ B) = P(A) + P(B) − 0 = P(A) + P(B). Pernyataan <b>Benar</b>.`},
+
+{t:"bs",q:`Tentukan apakah pernyataan berikut <b>Benar</b> atau <b>Salah</b>.<br><br>"Dua kejadian yang saling lepas dan masing-masing mempunyai peluang lebih dari nol pasti merupakan dua kejadian yang saling bebas."`,a:false,
+p:`Jika A, B saling lepas, P(A ∩ B) = 0. Agar saling bebas, harus P(A ∩ B) = P(A) × P(B). Karena P(A) &gt; 0 dan P(B) &gt; 0, maka P(A) × P(B) &gt; 0 ≠ 0.<br>
+Jadi kejadian tersebut <b>tidak</b> saling bebas. Contoh: pada satu dadu, A = mata 1 dan B = mata 2 saling lepas, tetapi ${fr(1,6)} × ${fr(1,6)} ≠ 0. Pernyataan <b>Salah</b>.`},
+
+{t:"bs",q:`Tentukan apakah pernyataan berikut <b>Benar</b> atau <b>Salah</b>.<br><br>"Pada pelemparan tiga keping uang logam secara bersamaan, peluang muncul paling sedikit satu sisi angka adalah ${fr(7,8)}."`,a:true,
+p:`n(S) = 2³ = 8. Komplemen "paling sedikit satu angka" adalah "tidak ada angka" = GGG (1 kejadian).<br>
+P = 1 − ${fr(1,8)} = ${fr(7,8)}. Pernyataan <b>Benar</b>.`}
+];
+
+const JENIS={pg:"Pilihan Ganda",pgk:"Pilihan Ganda Kompleks",jodoh:"Menjodohkan",isian:"Isian Singkat",bs:"Benar / Salah"};
+const PETUNJUK={pgk:"Pilih semua jawaban yang benar (lebih dari satu).",jodoh:"Pilih pasangan yang tepat untuk setiap pernyataan. Ada satu pilihan pengecoh.",isian:"Ketik jawabanmu pada kotak yang tersedia."};
+let jaw=[],cur=0,nama="",kelas="";
+
+function mulai(){
+  nama=document.getElementById('nama').value.trim();
+  kelas=document.getElementById('kelas').value.trim();
+  if(!nama||!kelas){document.getElementById('loginErr').textContent="Nama dan kelas wajib diisi.";return;}
+  jaw=SOAL.map(s=>s.t==="pgk"?[]:s.t==="jodoh"?s.l.map(()=>""):null);
+  document.getElementById('login').style.display="none";
+  document.getElementById('kuis').style.display="block";
+  document.getElementById('who').innerHTML=`👤 <b>${esc(nama)}</b> · ${esc(kelas)}`;
+  go(0);
+}
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function terjawab(i){const j=jaw[i],s=SOAL[i];
+  if(s.t==="pgk")return j.length>0;
+  if(s.t==="jodoh")return j.some(x=>x!=="");
+  if(s.t==="isian")return j!==null&&String(j).trim()!=="";
+  return j!==null;}
+
+function go(i){
+  if(i<0||i>=SOAL.length)return;
+  cur=i;const s=SOAL[i];let h=`<span class="tag">${JENIS[s.t]}</span><div class="qnum">Soal ${i+1} dari ${SOAL.length}</div><div class="qtext">${s.q}</div>`;
+  if(PETUNJUK[s.t])h+=`<div class="hint">${PETUNJUK[s.t]}</div>`;
+  if(s.t==="pg"||s.t==="pgk"){
+    s.o.forEach((o,k)=>{const sel=s.t==="pg"?jaw[i]===k:jaw[i].includes(k);
+      h+=`<div class="opt ${sel?'sel':''}" onclick="pilih(${k})"><span class="k">${s.t==="pgk"?(sel?'✓':L[k]):L[k]}</span><span>${s.t==="pgk"?`<b>${L[k]}.</b> `:""}${o}</span></div>`;});
+  }else if(s.t==="jodoh"){
+    s.l.forEach((l,k)=>{h+=`<div class="jrow"><span>${k+1}. ${l}</span><select onchange="jodoh(${k},this.value)"><option value="">— pilih —</option>${s.r.map((r,m)=>`<option value="${m}" ${String(jaw[i][k])===String(m)?'selected':''}>${L[m]}. ${r.replace(/<\/span><span>/g,"/").replace(/<[^>]+>/g,"")}</option>`).join("")}</select></div>`;});
+    h+=`<div style="font-size:.9rem;color:var(--muted);margin-top:4px">Pilihan: ${s.r.map((r,m)=>`<b>${L[m]}.</b> ${r}`).join(" &nbsp; ")}</div>`;
+  }else if(s.t==="isian"){
+    h+=`<input type="text" id="isi" placeholder="Jawaban..." value="${jaw[i]!==null?esc(String(jaw[i])):""}" oninput="jaw[cur]=this.value;grid()" autocomplete="off">`;
+  }else{
+    h+=`<div class="bsrow"><div class="opt ${jaw[i]===true?'sel':''}" onclick="pilih(true)">✔ Benar</div><div class="opt ${jaw[i]===false?'sel':''}" onclick="pilih(false)">✘ Salah</div></div>`;
+  }
+  document.getElementById('qbox').innerHTML=h;
+  document.getElementById('prev').disabled=i===0;
+  document.getElementById('next').disabled=i===SOAL.length-1;
+  grid();window.scrollTo({top:0,behavior:"smooth"});
+}
+function pilih(k){const s=SOAL[cur];
+  if(s.t==="pgk"){const a=jaw[cur];const x=a.indexOf(k);x>=0?a.splice(x,1):a.push(k);}
+  else jaw[cur]=k;
+  go(cur);}
+function jodoh(k,v){jaw[cur][k]=v;grid();}
+function grid(){
+  const n=SOAL.filter((_,i)=>terjawab(i)).length;
+  document.getElementById('prog').textContent=`Terjawab ${n}/${SOAL.length}`;
+  document.getElementById('barIn').style.width=(n/SOAL.length*100)+"%";
+  document.getElementById('grid').innerHTML=SOAL.map((_,i)=>`<button class="${terjawab(i)?'done':''} ${i===cur?'cur':''}" onclick="go(${i})">${i+1}</button>`).join("");
+}
+function konfirmasi(){const k=SOAL.length-SOAL.filter((_,i)=>terjawab(i)).length;
+  document.getElementById('mTxt').textContent=k?`Masih ada ${k} soal yang belum dijawab. Yakin ingin mengumpulkan?`:"Semua soal sudah dijawab. Kumpulkan sekarang?";
+  document.getElementById('modal').style.display="flex";}
+function tutupModal(){document.getElementById('modal').style.display="none";}
+
+function nilaiIsian(str){
+  if(str===null)return NaN;
+  str=String(str).trim().replace(/\s/g,"").replace(/\.(?=\d{3}(\D|$))/g,"").replace(",",".");
+  if(/^-?\d+(\.\d+)?\/-?\d+(\.\d+)?$/.test(str)){const [a,b]=str.split("/").map(Number);return b?a/b:NaN;}
+  return /^-?\d+(\.\d+)?$/.test(str)?Number(str):NaN;}
+function cek(i){const s=SOAL[i],j=jaw[i];
+  if(!terjawab(i))return null;
+  if(s.t==="pg"||s.t==="bs")return j===s.a;
+  if(s.t==="pgk")return j.length===s.a.length&&s.a.every(x=>j.includes(x));
+  if(s.t==="jodoh")return s.a.every((x,k)=>String(j[k])===String(x));
+  if(s.t==="isian"){const v=nilaiIsian(j),k=nilaiIsian(s.a);return Math.abs(v-k)<1e-9;}
+}
+function teksJawab(i,kunci){const s=SOAL[i],j=kunci?s.a:jaw[i];
+  if(!kunci&&!terjawab(i))return "<i>Tidak dijawab</i>";
+  if(s.t==="pg")return `${L[j]}. ${s.o[j]}`;
+  if(s.t==="pgk")return [...j].sort().map(x=>L[x]).join(", ");
+  if(s.t==="bs")return j?"Benar":"Salah";
+  if(s.t==="isian")return esc(String(j));
+  return s.l.map((l,k)=>`${k+1} → ${j[k]===""?"–":L[j[k]]+" ("+s.r[j[k]]+")"}`).join("; ");
+}
+let hasilCek=[];
+function selesai(){tutupModal();
+  hasilCek=SOAL.map((_,i)=>cek(i));
+  const b=hasilCek.filter(x=>x===true).length,kos=hasilCek.filter(x=>x===null).length,sa=SOAL.length-b-kos;
+  document.getElementById('kuis').style.display="none";
+  document.getElementById('hasil').style.display="block";
+  document.getElementById('hNama').textContent=nama;
+  document.getElementById('hKelas').textContent="Kelas "+kelas;
+  document.getElementById('hSkor').textContent=Math.round(b/SOAL.length*1000)/10;
+  document.getElementById('hBenar').textContent=b;
+  document.getElementById('hSalah').textContent=sa;
+  document.getElementById('hKosong').textContent=kos;
+  const rinci=Object.keys(JENIS).map(t=>{const idx=SOAL.map((s,i)=>s.t===t?i:-1).filter(i=>i>=0);
+    return `${JENIS[t]}: <b>${idx.filter(i=>hasilCek[i]===true).length}/${idx.length}</b>`}).join(" · ");
+  document.getElementById('hRinci').innerHTML=rinci+`<br><small>Diselesaikan: ${new Date().toLocaleString('id-ID')}</small>`;
+  const f=[["semua","Semua"],["salah","Salah/Kosong"],...Object.entries(JENIS)];
+  document.getElementById('filter').innerHTML=f.map(([k,v],n)=>`<button class="${n===0?'on':''}" onclick="saring('${k}',this)">${v}</button>`).join("");
+  saring("semua");window.scrollTo({top:0});
+}
+function saring(k,el){
+  if(el){document.querySelectorAll('#filter button').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+  document.getElementById('pbList').innerHTML=SOAL.map((s,i)=>{
+    const c=hasilCek[i];
+    if(k==="salah"&&c===true)return"";
+    if(JENIS[k]&&s.t!==k)return"";
+    return `<div class="pb ${c?'benar':'salah'}">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>Soal ${i+1} · ${JENIS[s.t]}</b><span class="badge ${c?'b':'s'}">${c?'✔ Benar':c===null?'– Kosong':'✘ Salah'}</span></div>
+      <div class="qtext" style="font-size:.95rem;margin:10px 0">${s.q}</div>
+      ${s.t==="pg"||s.t==="pgk"?`<div style="font-size:.88rem;line-height:1.7;margin-bottom:6px">${s.o.map((o,m)=>`<b>${L[m]}.</b> ${o}`).join("<br>")}</div>`:""}
+      ${s.t==="jodoh"?`<div style="font-size:.88rem;line-height:1.7;margin-bottom:6px">${s.l.map((l,m)=>`${m+1}. ${l}`).join("<br>")}<br>Pilihan: ${s.r.map((r,m)=>`<b>${L[m]}.</b> ${r}`).join(" &nbsp; ")}</div>`:""}
+      <div class="ans">Jawabanmu: <b>${teksJawab(i,false)}</b><br>Kunci: <b style="color:var(--ok)">${teksJawab(i,true)}</b></div>
+      <div class="sol"><b>Pembahasan:</b><br>${s.p}</div></div>`;}).join("")||"<p class='sub' style='margin-top:12px'>Tidak ada soal pada kategori ini. Hebat!</p>";
+}
+function ulang(){document.getElementById('hasil').style.display="none";document.getElementById('login').style.display="block";window.scrollTo({top:0});}
+document.getElementById('kelas').addEventListener('keydown',e=>{if(e.key==="Enter")mulai()});
+</script>
+</body>
+</html>
